@@ -1,5 +1,3 @@
-import React from 'react';
-
 function LoggedInName()
 {
     let _ud;
@@ -19,8 +17,7 @@ function LoggedInName()
         console.error("Could not parse user data from local storage", e);
     }
 
-
-    const doLogout = (event:any) =>
+    const doLogout = (event: React.MouseEvent<HTMLButtonElement>) =>
     {
 	    event.preventDefault();
         localStorage.removeItem('user_data');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function Login()
 {
@@ -19,7 +19,7 @@ function Login()
       }
   }
 
-  const doLogin = async (event: any) => {
+  const doLogin = async (event: React.MouseEvent<HTMLInputElement>) => {
     event.preventDefault();
 
     const obj = { login: loginName, password: loginPassword };
@@ -42,18 +42,19 @@ function Login()
         setMessage('');
         window.location.href = '/cards';
       }
-    } catch (e: any) {
-      alert(e.toString());
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
+      alert(errorMessage);
       return;
     }
   };
 
-  function handleSetLoginName(e: any): void
+  function handleSetLoginName(e: React.ChangeEvent<HTMLInputElement>): void
   {
     setLoginName(e.target.value);
   }
 
-  function handleSetPassword(e: any): void
+  function handleSetPassword(e: React.ChangeEvent<HTMLInputElement>): void
   {
     setPassword(e.target.value);
   }

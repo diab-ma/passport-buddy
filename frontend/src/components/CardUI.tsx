@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function CardUI()
 {
@@ -36,17 +36,17 @@ function CardUI()
       }
   }
 
-  function handleSearchTextChange(e: any): void
+  function handleSearchTextChange(e: React.ChangeEvent<HTMLInputElement>): void
   {
     setSearchValue(e.target.value);
   }
 
-  function handleCardTextChange(e: any): void
+  function handleCardTextChange(e: React.ChangeEvent<HTMLInputElement>): void
   {
     setCardNameValue(e.target.value);
   }
 
-  const addCard = async (e: any) =>
+  const addCard = async (e: React.MouseEvent<HTMLButtonElement>) =>
   {
     e.preventDefault();
 
@@ -72,13 +72,14 @@ function CardUI()
         setMessage('Card has been added');
       }
     }
-    catch (e: any)
+    catch (e: unknown)
     {
-      setMessage(e.toString());
+      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
+      setMessage(errorMessage);
     }
   };
 
-  const searchCard = async (e: any) =>
+  const searchCard = async (e: React.MouseEvent<HTMLButtonElement>) =>
   {
     e.preventDefault();
     
@@ -95,9 +96,9 @@ function CardUI()
 
       const txt = await response.text();
       const res = JSON.parse(txt);
-      let _results = res.results;
+      const _results = res.results;
       let resultText = '';
-      for (var i = 0; i < _results.length; i++)
+      for (let i = 0; i < _results.length; i++)
       {
         resultText += _results[i];
         if (i < _results.length - 1)
@@ -108,10 +109,11 @@ function CardUI()
       setResults('Card(s) have been retrieved');
       setCardList(resultText);
     }
-    catch (e: any)
+    catch (e: unknown)
     {
-      alert(e.toString());
-      setResults(e.toString());
+      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred';
+      alert(errorMessage);
+      setResults(errorMessage);
     }
   };
 
