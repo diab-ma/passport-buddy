@@ -43,7 +43,7 @@ jobs:
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          run: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${{ secrets.DROPLET_IP_ADDRESS }} "cd /var/www/passport-buddy && git pull origin main && npm install && cd frontend && npm install && npm run build && cd .. && pm2 restart passport-buddy"
+          run: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${{ secrets.DROPLET_IP_ADDRESS }} "cd /var/www/passport-buddy && git pull origin main && npm install && cd frontend && npm install && npm run build && cd .. && pm2 restart passport-buddy || pm2 start server.js --name passport-buddy"
 
   # --- Job to Deploy the Backend ---
   deploy-backend:
