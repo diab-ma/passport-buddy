@@ -22,7 +22,7 @@ jobs:
 
       - name: Deploy and Restart
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${{ secrets.DROPLET_IP_ADDRESS }} "
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd /var/www/passport-buddy && \
             git pull origin main && \
             npm install && \
