@@ -1,0 +1,71 @@
+# This is the CI/CD workflow file for deploying the Passport Buddy application.
+# It should be placed in your repository at: .github/workflows/main.yml
+
+name: Deploy Passport Buddy
+
+# This workflow runs on any push or pull request to the 'master' or 'main' branch.
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  # --- Job to Deploy the Frontend ---
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20' # Use a current LTS version of Node.js
+
+      # Step 3: Install frontend dependencies and build the project
+      - name: Install Dependencies and Build
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      # Step 4: Install sshpass for non-interactive SSH login
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      # Step 5: Deploy the build files to the Digital Ocean droplet
+      - name: Deploy Frontend to Droplet
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          scp -r -o StrictHostKeyChecking=no frontend/dist/* ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/var/www/html/
+
+  # --- Job to Deploy the Backend ---
+  deploy-backend:
+    runs-on: ubuntu-latest
+    # This job will only run if the frontend job completes successfully
+    needs: deploy-frontend
+    steps:
+      # Step 1: Install sshpass
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+      
+      # Step 2: Deploy backend, install dependencies, and restart PM2
+      - name: Deploy Backend and Restart Server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          sshpass -p "${SSH_KEY}" ssh -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_HOST} << 'EOF'
+            cd /var/www/passport-buddy-backend
+            git pull origin main
+            npm install --omit=dev
+            pm2 restart all
+          EOF
+
