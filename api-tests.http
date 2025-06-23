@@ -1,0 +1,44 @@
+### Test Login API
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "login": "rickl",
+  "password": "COP4331"
+}
+
+### Test Login with Wrong Password
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "login": "rickl",
+  "password": "wrongpassword"
+}
+
+### Test Add Card API
+POST http://localhost:5000/api/addcard
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "card": "Mickey Mouse Card"
+}
+
+### Test Search Cards API
+POST http://localhost:5000/api/searchcards
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "search": "babe"
+}
+
+### Test Search Cards - Another Example
+POST http://localhost:5000/api/searchcards
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "search": "mickey"
+}
