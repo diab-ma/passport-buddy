@@ -1,0 +1,33 @@
+# Dependencies
+# Ignore the node_modules folder for the backend
+node_modules/
+
+# Also ignore the node_modules folder for the frontend, as a backup
+frontend/node_modules/
+
+# Build output
+# Ignore the frontend build/distribution folder
+frontend/dist/
+frontend/build/
+
+# Environment variables
+# Never commit your environment variables file
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# PM2
+.pm2/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
