@@ -1,43 +1,43 @@
 name: Deploy to Droplet
 
-   on:
-     push:
-       branches:
-         - main
+on:
+  push:
+    branches:
+      - main
 
-   jobs:
-     deploy:
-       runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-       steps:
-         - name: Checkout Code
-           uses: actions/checkout@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-         - name: Get Host Key and Install SSH Key
-           run: |
-             mkdir -p ~/.ssh
-             ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-             echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-             chmod 600 ~/.ssh/id_ed25519
-           env:
-             SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Get Host Key and Install SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-         - name: Deploy and Restart
-           run: |
-             ssh -i ~/.ssh/id_ed25519 -o UserKnownHostsFile=~/.ssh/known_hosts ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
-               if [ ! -d "/var/www/passport-buddy" ]; then
-                 mkdir -p /var/www/passport-buddy
-                 cd /var/www/passport-buddy
-                 git init
-                 git remote add origin https://github.com/diab-ma/passport-buddy.git
-               else
-                 cd /var/www/passport-buddy
-               fi
-               git pull origin main
-               npm install
-               cd frontend
-               npm install
-               npm run build
-               cd ..
-               pm2 restart passport-buddy || pm2 start server.js --name passport-buddy
-             EOF
+      - name: Deploy and Restart
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o UserKnownHostsFile=~/.ssh/known_hosts ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
+            if [ ! -d "/var/www/passport-buddy" ]; then
+              mkdir -p /var/www/passport-buddy
+              cd /var/www/passport-buddy
+              git init
+              git remote add origin https://github.com/diab-ma/passport-buddy.git
+            else
+              cd /var/www/passport-buddy
+            fi
+            git pull origin main
+            npm install
+            cd frontend
+            npm install
+            npm run build
+            cd ..
+            pm2 restart passport-buddy || pm2 start server.js --name passport-buddy
+          EOF
