@@ -39,5 +39,10 @@ jobs:
             npm install
             npm run build
             cd ..
+            # Set proper permissions
+            sudo chown -R www-data:www-data /var/www/passport-buddy/frontend/dist
+            sudo chmod -R 755 /var/www/passport-buddy/frontend/dist
+            # Restart services
             pm2 restart passport-buddy || pm2 start server.js --name passport-buddy
+            sudo systemctl restart nginx
           EOF
