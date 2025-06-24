@@ -1,12 +1,5 @@
 name: Deploy to Droplet
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:name: Deploy to Droplet
-
    on:
      push:
        branches:
@@ -24,14 +17,14 @@ jobs:name: Deploy to Droplet
            run: |
              mkdir -p ~/.ssh
              ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-             echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-             chmod 600 ~/.ssh/id_rsa
+             echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+             chmod 600 ~/.ssh/id_ed25519
            env:
              SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
          - name: Deploy and Restart
            run: |
-             ssh -o UserKnownHostsFile=~/.ssh/known_hosts ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
+             ssh -i ~/.ssh/id_ed25519 -o UserKnownHostsFile=~/.ssh/known_hosts ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
                if [ ! -d "/var/www/passport-buddy" ]; then
                  mkdir -p /var/www/passport-buddy
                  cd /var/www/passport-buddy
@@ -48,29 +41,3 @@ jobs:name: Deploy to Droplet
                cd ..
                pm2 restart passport-buddy || pm2 start server.js --name passport-buddy
              EOF
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          name: id_rsa # Default is id_rsa
-          known_hosts: "just-a-placeholder-so-we-can-use-StrictHostKeyChecking-no"
-
-      - name: Deploy and Restart
-        run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
-            cd /var/www/passport-buddy && \
-            git pull origin main && \
-            npm install && \
-            cd frontend && \
-            npm install && \
-            npm run build && \
-            cd .. && \
-            pm2 restart passport-buddy || pm2 start server.js --name passport-buddy
-          "
